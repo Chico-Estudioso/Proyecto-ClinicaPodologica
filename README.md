@@ -187,11 +187,3 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para
 ⭐ **¡Dale una estrella si este proyecto te ha sido útil!**
 ```
 
-Este README incluye toda la información esencial del proyecto de manera profesional y organizada. Puedes personalizarlo cambiando:
-
-1. **Tu información personal** en la sección de autor
-2. **La URL del demo** cuando tengas el sitio desplegado
-3. **El nombre de usuario de GitHub** en los enlaces
-4. **Cualquier información específica** de tu implementación
-
-¿Te gustaría que modifique alguna sección o añada información adicional?
