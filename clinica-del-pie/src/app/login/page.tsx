@@ -5,8 +5,8 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";  // Si no tienes estos componentes, usa <input>
-import { Label } from "@/components/ui/label";  // Opon etiquetas HTML habituales
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
@@ -49,7 +49,9 @@ export default function LoginPage() {
                 id="username"
                 type="text"
                 value={userInfo.username}
-                onChange={(e) => setUserInfo({ ...userInfo, username: e.target.value })}
+                onChange={(e) =>
+                  setUserInfo({ ...userInfo, username: e.target.value })
+                }
                 required
               />
             </div>
@@ -59,7 +61,9 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 value={userInfo.password}
-                onChange={(e) => setUserInfo({ ...userInfo, password: e.target.value })}
+                onChange={(e) =>
+                  setUserInfo({ ...userInfo, password: e.target.value })
+                }
                 required
               />
             </div>
@@ -68,9 +72,22 @@ export default function LoginPage() {
               {isLoading ? "Cargando..." : "Entrar"}
             </Button>
           </form>
+
+        {/* Enlace al registro */}
+        <div className="mt-4 text-center">
+          <p className="text-sm">
+            ¿No tienes cuenta?{" "}
+            <Button
+              variant="link"
+              onClick={() => router.push("/register")}
+              className="p-0 text-blue-600 hover:underline"
+            >
+              Registrarse
+            </Button>
+          </p>
+        </div>
         </CardContent>
       </Card>
     </div>
   );
 }
-
