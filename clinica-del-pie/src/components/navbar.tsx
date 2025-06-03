@@ -1,32 +1,39 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Menu, X } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Menu, X, ChevronDown } from "lucide-react";
 
 const navigation = [
   { name: "Inicio", href: "/" },
   { name: "Servicios", href: "/servicios" },
   { name: "Equipo", href: "/equipo" },
   { name: "Contacto", href: "/contacto" },
-]
+];
 
 export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const pathname = usePathname()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const { data: session, status } = useSession();
+  // status puede ser "loading" | "authenticated" | "unauthenticated"
+
+  const pathname = usePathname();
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <nav className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+        {/* LOGO */}
         <div className="flex lg:flex-1">
           <Link href="/" className="flex items-center">
             <span className="text-xl font-bold text-blue-600">Clínica Podológica</span>
           </Link>
         </div>
 
-        {/* Mobile menu button */}
+        {/* Botón para abrir menú móvil */}
         <div className="flex lg:hidden">
           <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
             <Menu className="h-6 w-6" />
@@ -34,7 +41,7 @@ export default function Navbar() {
           </Button>
         </div>
 
-        {/* Desktop navigation */}
+        {/* Navegación de escritorio */}
         <div className="hidden lg:flex lg:gap-x-8">
           {navigation.map((item) => (
             <Link
@@ -49,16 +56,55 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+        {/* Zona derecha: “Pedir cita” + login/usuario */}
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center gap-4 relative">
+          {/* Botón “Pedir cita” siempre fijo */}
           <Button asChild className="bg-blue-600 hover:bg-blue-700">
             <Link href="/contacto">Pedir cita</Link>
           </Button>
+
+          {status === "loading" ? (
+            // Mientras NextAuth aún no decide si hay sesión o no
+            <div className="ml-4 text-gray-500">Cargando…</div>
+          ) : session ? (
+            // Si el usuario está autenticado, mostramos su nombre y un desplegable
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                className="inline-flex items-center gap-1 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                <span className="text-gray-700">{session.user.username}</span>
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              </button>
+              {userMenuOpen && (
+                <ul className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+                  <li>
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </li>
+                  {/* Aquí podrías añadir más opciones, p. ej. “Mi perfil” */}
+                </ul>
+              )}
+            </div>
+          ) : (
+            // Si NO está autenticado, mostramos “Iniciar sesión”
+            <Button asChild variant="outline">
+              <Link href="/login">Iniciar sesión</Link>
+            </Button>
+          )}
         </div>
 
-        {/* Mobile menu */}
+        {/* Menú móvil */}
         {mobileMenuOpen && (
           <div className="lg:hidden fixed inset-0 z-50">
-            <div className="fixed inset-0 bg-black/25" onClick={() => setMobileMenuOpen(false)} />
+            <div
+              className="fixed inset-0 bg-black/25"
+              onClick={() => setMobileMenuOpen(false)}
+            />
             <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm">
               <div className="flex items-center justify-between">
                 <Link href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
@@ -76,7 +122,9 @@ export default function Navbar() {
                       key={item.name}
                       href={item.href}
                       className={`-mx-3 block rounded-lg px-3 py-2 text-base font-medium ${
-                        pathname === item.href ? "text-blue-600 bg-blue-50" : "text-gray-700 hover:bg-gray-50"
+                        pathname === item.href
+                          ? "text-blue-600 bg-blue-50"
+                          : "text-gray-700 hover:bg-gray-50"
                       }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -85,11 +133,34 @@ export default function Navbar() {
                   ))}
                 </div>
                 <div className="py-6">
-                  <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
-                    <Link href="/contacto" onClick={() => setMobileMenuOpen(false)}>
-                      Pedir cita
-                    </Link>
+                  <Button
+                    asChild
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Link href="/contacto">Pedir cita</Link>
                   </Button>
+                </div>
+                <div className="py-4 border-t border-gray-200">
+                  {session ? (
+                    <button
+                      onClick={() => {
+                        signOut({ callbackUrl: "/" });
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      Cerrar sesión
+                    </button>
+                  ) : (
+                    <Button
+                      asChild
+                      className="w-full bg-white text-blue-600 border border-blue-600 hover:bg-blue-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Link href="/login">Iniciar sesión</Link>
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -97,5 +168,5 @@ export default function Navbar() {
         )}
       </nav>
     </header>
-  )
+  );
 }

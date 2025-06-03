@@ -1,8 +1,9 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, Phone, MapPin, Clock } from "lucide-react"
+// src/app/page.tsx
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, Phone, MapPin, Clock } from "lucide-react";
 
 export default function Home() {
   return (
@@ -25,6 +26,10 @@ export default function Home() {
                 </Button>
                 <Button asChild variant="outline" size="lg">
                   <Link href="/servicios">Ver servicios</Link>
+                </Button>
+                {/* Botón “Iniciar sesión” */}
+                <Button asChild variant="outline" size="lg">
+                  <Link href="/login">Iniciar sesión</Link>
                 </Button>
               </div>
             </div>
@@ -129,7 +134,7 @@ export default function Home() {
                 <CardTitle className="text-xl">Contacto</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700">+34 927 53 12 32 </p>
+                <p className="text-gray-700">+34 927 53 12 32</p>
                 <p className="text-gray-700">info@clinicapodologica.com</p>
               </CardContent>
             </Card>
@@ -161,5 +166,5 @@ export default function Home() {
         </div>
       </section>
     </div>
-  )
+  );
 }
