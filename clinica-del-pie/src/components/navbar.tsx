@@ -32,7 +32,6 @@ export default function Navbar() {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <nav className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-        {/* LOGO */}
         <div className="flex lg:flex-1">
           <Link href="/" className="flex items-center">
             <span className="text-xl font-bold text-blue-600">
@@ -41,7 +40,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Botón para abrir menú móvil */}
+        {/* Menú móvil */}
         <div className="flex lg:hidden">
           <Button
             variant="ghost"
@@ -53,7 +52,7 @@ export default function Navbar() {
           </Button>
         </div>
 
-        {/* Navegación de escritorio */}
+        {/* Navegación escritorio */}
         <div className="hidden lg:flex lg:gap-x-8">
           {navigation.map((item) => (
             <Link
@@ -70,9 +69,8 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Zona derecha: “Pedir cita” + login/usuario */}
+        {/* Zona usuario */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center gap-4 relative">
-          {/* ✅ Botón dinámico de Pedir cita */}
           <Button
             onClick={handlePedirCita}
             className="bg-blue-600 hover:bg-blue-700"
@@ -102,6 +100,19 @@ export default function Navbar() {
                       Mis datos
                     </Link>
                   </li>
+
+                  {session.user.role === "ADMIN" && (
+                    <li>
+                      <Link
+                        href="/dashboard/admin"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        Administración
+                      </Link>
+                    </li>
+                  )}
+
                   <li>
                     <button
                       onClick={() => signOut({ callbackUrl: "/" })}
@@ -120,7 +131,7 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Menú móvil */}
+        {/* Menú móvil desplegable */}
         {mobileMenuOpen && (
           <div className="lg:hidden fixed inset-0 z-50">
             <div
@@ -144,9 +155,9 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <X className="h-6 w-6" />
-                  <span className="sr-only">Cerrar menú</span>
                 </Button>
               </div>
+
               <div className="mt-6 flow-root">
                 <div className="space-y-2 py-6">
                   {navigation.map((item) => (
@@ -163,9 +174,19 @@ export default function Navbar() {
                       {item.name}
                     </Link>
                   ))}
+
+                  {/* ✅ Link de admin en menú móvil */}
+                  {session?.user.role === "ADMIN" && (
+                    <Link
+                      href="/dashboard/admin"
+                      className="block px-3 py-2 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Administración
+                    </Link>
+                  )}
                 </div>
 
-                {/* ✅ Botón móvil de Pedir cita */}
                 <div className="py-6">
                   <Button
                     className="w-full bg-blue-600 hover:bg-blue-700"

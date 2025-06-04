@@ -64,6 +64,7 @@ model Appointment {
   userId    String
   date      DateTime
   createdAt DateTime @default(now())
+  attended  Boolean? // ✅ Nuevo campo: null = no marcado, true/false  
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

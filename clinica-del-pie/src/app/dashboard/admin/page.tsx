@@ -21,6 +21,7 @@ export default async function AdminDashboardPage() {
   const mapped = appointments.map((appt) => ({
     id: appt.id,
     date: appt.date.toISOString(),
+    attended: appt.attended,
     user: {
       username: appt.user.username,
       email: appt.user.email ?? "",
