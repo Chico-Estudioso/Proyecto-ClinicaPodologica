@@ -19,9 +19,15 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const { data: session, status } = useSession();
-  // status puede ser "loading" | "authenticated" | "unauthenticated"
-
   const pathname = usePathname();
+
+  const handlePedirCita = () => {
+    if (session) {
+      window.location.href = "/citas/reservar";
+    } else {
+      window.location.href = "/contacto";
+    }
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -29,13 +35,19 @@ export default function Navbar() {
         {/* LOGO */}
         <div className="flex lg:flex-1">
           <Link href="/" className="flex items-center">
-            <span className="text-xl font-bold text-blue-600">Clínica Podológica</span>
+            <span className="text-xl font-bold text-blue-600">
+              Clínica Podológica
+            </span>
           </Link>
         </div>
 
         {/* Botón para abrir menú móvil */}
         <div className="flex lg:hidden">
-          <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileMenuOpen(true)}
+          >
             <Menu className="h-6 w-6" />
             <span className="sr-only">Abrir menú</span>
           </Button>
@@ -48,7 +60,9 @@ export default function Navbar() {
               key={item.name}
               href={item.href}
               className={`text-base font-medium transition-colors ${
-                pathname === item.href ? "text-blue-600" : "text-gray-700 hover:text-blue-600"
+                pathname === item.href
+                  ? "text-blue-600"
+                  : "text-gray-700 hover:text-blue-600"
               }`}
             >
               {item.name}
@@ -58,16 +72,17 @@ export default function Navbar() {
 
         {/* Zona derecha: “Pedir cita” + login/usuario */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center gap-4 relative">
-          {/* Botón “Pedir cita” siempre fijo */}
-          <Button asChild className="bg-blue-600 hover:bg-blue-700">
-            <Link href="/contacto">Pedir cita</Link>
+          {/* ✅ Botón dinámico de Pedir cita */}
+          <Button
+            onClick={handlePedirCita}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Pedir cita
           </Button>
 
           {status === "loading" ? (
-            // Mientras NextAuth aún no decide si hay sesión o no
             <div className="ml-4 text-gray-500">Cargando…</div>
           ) : session ? (
-            // Si el usuario está autenticado, mostramos su nombre y un desplegable
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen((prev) => !prev)}
@@ -79,6 +94,15 @@ export default function Navbar() {
               {userMenuOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
                   <li>
+                    <Link
+                      href="/dashboard"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      Mis datos
+                    </Link>
+                  </li>
+                  <li>
                     <button
                       onClick={() => signOut({ callbackUrl: "/" })}
                       className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -86,12 +110,10 @@ export default function Navbar() {
                       Cerrar sesión
                     </button>
                   </li>
-                  {/* Aquí podrías añadir más opciones, p. ej. “Mi perfil” */}
                 </ul>
               )}
             </div>
           ) : (
-            // Si NO está autenticado, mostramos “Iniciar sesión”
             <Button asChild variant="outline">
               <Link href="/login">Iniciar sesión</Link>
             </Button>
@@ -107,10 +129,20 @@ export default function Navbar() {
             />
             <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm">
               <div className="flex items-center justify-between">
-                <Link href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="text-xl font-bold text-blue-600">Clínica Podológica</span>
+                <Link
+                  href="/"
+                  className="-m-1.5 p-1.5"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className="text-xl font-bold text-blue-600">
+                    Clínica Podológica
+                  </span>
                 </Link>
-                <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   <X className="h-6 w-6" />
                   <span className="sr-only">Cerrar menú</span>
                 </Button>
@@ -132,15 +164,24 @@ export default function Navbar() {
                     </Link>
                   ))}
                 </div>
+
+                {/* ✅ Botón móvil de Pedir cita */}
                 <div className="py-6">
                   <Button
-                    asChild
                     className="w-full bg-blue-600 hover:bg-blue-700"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (session) {
+                        window.location.href = "/citas/reservar";
+                      } else {
+                        window.location.href = "/contacto";
+                      }
+                    }}
                   >
-                    <Link href="/contacto">Pedir cita</Link>
+                    Pedir cita
                   </Button>
                 </div>
+
                 <div className="py-4 border-t border-gray-200">
                   {session ? (
                     <button

@@ -7,20 +7,20 @@ const prisma = new PrismaClient();
 async function main() {
   // Verificar si ya existe un usuario con username "admin"
   const existingAdmin = await prisma.user.findUnique({
-    where: { username: "admin" },
+    where: { username: "Admin" },
   });
 
   if (!existingAdmin) {
     const hashed = await bcrypt.hash("1m2s3g", 10);
     await prisma.user.create({
       data: {
-        username: "admin",
+        username: "Admin",
         password: hashed,
         role: "ADMIN",
         email: "admin@clinicapodologica.com", // opcional
       },
     });
-    console.log("🛡️ Usuario admin creado: usuario=admin, contraseña=1m2s3g");
+    console.log("🛡️ Usuario admin creado: usuario=Admin, contraseña=1m2s3g");
   } else {
     console.log("⚠️ El usuario admin ya existe, no se crea de nuevo.");
   }
