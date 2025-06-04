@@ -18,7 +18,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6">PÁGINA USUARIOS</h1>
       <p className="mb-4">Hola, {session.user.username}.</p>
       {isAdmin ? (
         <div>
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
           {/* Funcionalidades de admin aquí */}
         </div>
       ) : (
-        <p className="text-gray-700">Eres un usuario normal.</p>
+        <p className="text-gray-700">Eres un usuario registrado ya.</p>
       )}
       <div className="mt-8">
         <Button asChild>

@@ -73,19 +73,19 @@ export default function LoginPage() {
             </Button>
           </form>
 
-        {/* Enlace al registro */}
-        <div className="mt-4 text-center">
-          <p className="text-sm">
-            ¿No tienes cuenta?{" "}
-            <Button
-              variant="link"
-              onClick={() => router.push("/register")}
-              className="p-0 text-blue-600 hover:underline"
-            >
-              Registrarse
-            </Button>
-          </p>
-        </div>
+          {/* Enlace al registro */}
+          <div className="mt-4 text-center">
+            <p className="text-sm">
+              ¿No tienes cuenta?{" "}
+              <Button
+                variant="link"
+                onClick={() => router.push("/register")}
+                className="p-0 text-blue-600 hover:underline"
+              >
+                Registrarse
+              </Button>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

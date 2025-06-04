@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 interface FormState {
   username: string;
@@ -54,8 +55,20 @@ export default function RegisterPage() {
         throw new Error(data.message || "Error al registrarse");
       }
 
-      toast.success("Registro exitoso. Ya puedes iniciar sesión.");
-      router.push("/login");
+      // Autologin al registrar
+      const loginRes = await signIn("credentials", {
+        redirect: false,
+        username: form.username,
+        password: form.password,
+      });
+
+      if (loginRes?.error) {
+        setError("Registro exitoso, pero error al iniciar sesión.");
+        setIsLoading(false);
+      } else {
+        toast.success("Cuenta creada e inicio de sesión exitoso.");
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setError(err.message);
       setIsLoading(false);
@@ -77,9 +90,7 @@ export default function RegisterPage() {
                 id="username"
                 type="text"
                 value={form.username}
-                onChange={(e) =>
-                  setForm({ ...form, username: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
                 required
               />
             </div>
@@ -91,9 +102,7 @@ export default function RegisterPage() {
                 id="email"
                 type="email"
                 value={form.email}
-                onChange={(e) =>
-                  setForm({ ...form, email: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 required
               />
             </div>
@@ -105,9 +114,7 @@ export default function RegisterPage() {
                 id="password"
                 type="password"
                 value={form.password}
-                onChange={(e) =>
-                  setForm({ ...form, password: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
                 required
                 minLength={6}
               />
