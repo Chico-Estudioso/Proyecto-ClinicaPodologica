@@ -13,15 +13,18 @@ type Props = {
   appointments: Appointment[];
   isAdmin: boolean;
   username: string;
+  emailVerified: string | null | undefined; // ✅ actualizado
 };
 
 export default function DashboardClient({
   appointments: initialAppointments,
   isAdmin,
   username,
+  emailVerified,
 }: Props) {
   const [appointments, setAppointments] = useState(initialAppointments);
   const [isPending, startTransition] = useTransition();
+  const [resendLoading, setResendLoading] = useState(false);
 
   const handleCancel = async (id: string) => {
     const res = await fetch(`/api/appointments/${id}`, {
@@ -39,6 +42,25 @@ export default function DashboardClient({
     }
   };
 
+  const handleResendEmail = async () => {
+    setResendLoading(true);
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message || "Correo reenviado");
+      } else {
+        toast.error(data.message || "No se pudo reenviar el correo");
+      }
+    } catch (err) {
+      toast.error("Error al reenviar verificación.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const now = new Date();
   const citasFuturas = appointments.filter((appt) => new Date(appt.date) > now);
   const citasPasadas = appointments.filter(
@@ -48,7 +70,29 @@ export default function DashboardClient({
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-3xl font-bold mb-6">PÁGINA USUARIOS</h1>
-      <p className="mb-4">Hola, {username}.</p>
+      <p className="mb-2">Hola, {username}.</p>
+      {isAdmin ? (
+        <p className="text-green-700 font-medium mb-4">Eres Administrador.</p>
+      ) : (
+        <p className="text-gray-700 mb-4">Eres un usuario registrado.</p>
+      )}
+
+      {emailVerified === null && (
+        <div className="bg-yellow-100 text-yellow-800 p-4 rounded mb-6">
+          ⚠️ Tu cuenta aún no está verificada.
+          <br />
+          Puedes reservar 1 sola cita. Revisa tu correo o{" "}
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-2"
+            onClick={handleResendEmail}
+            disabled={resendLoading}
+          >
+            Reenviar email de verificación
+          </Button>
+        </div>
+      )}
 
       {/* FUTURAS */}
       <div className="mt-8">

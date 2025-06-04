@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { AuthOptions } from "next-auth";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import EmailProvider from "next-auth/providers/email";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(db),
@@ -36,6 +37,17 @@ export const authOptions: AuthOptions = {
           email: userInDb.email ?? null, // ✅ Solo usamos email
         };
       },
+    }),
+    EmailProvider({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: Number(process.env.EMAIL_SERVER_PORT),
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
+        },
+      },
+      from: process.env.EMAIL_FROM,
     }),
   ],
   callbacks: {

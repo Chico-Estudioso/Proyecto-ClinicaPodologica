@@ -15,7 +15,8 @@ model User {
   role      String   @default("USER")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  emailVerified      DateTime?
+  emailVerifyToken   String?  // 👈 Añadido
   sessions     Session[]
   accounts     Account[]
   appointments Appointment[] // NUEVA relación

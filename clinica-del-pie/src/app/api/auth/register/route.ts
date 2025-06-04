@@ -2,6 +2,8 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { resend } from "@/lib/resend";
+import { randomUUID } from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -9,7 +11,6 @@ export async function POST(req: Request) {
   try {
     const { username, email, password } = await req.json();
 
-    // 1. Validaciones básicas
     if (
       !username ||
       typeof username !== "string" ||
@@ -24,11 +25,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Comprobar que no exista ya un usuario con ese username o email
     const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ username }, { email }],
-      },
+      where: { OR: [{ username }, { email }] },
     });
 
     if (existingUser) {
@@ -38,24 +36,42 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3. Hashear la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
+    const verifyToken = randomUUID();
 
-    // 4. Crear el usuario en la base de datos
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         username,
         email,
         password: hashedPassword,
-        role: "USER", // Rol por defecto
+        role: "USER",
+        emailVerifyToken: verifyToken,
       },
     });
 
+    await resend.emails.send({
+      from: "Clínica del Pie <onboarding@resend.dev>",
+      to: newUser.email!,
+      subject: "Verifica tu cuenta",
+      html: `
+        <h2>¡Hola, ${newUser.username}!</h2>
+        <p>Gracias por registrarte en Clínica del Pie.</p>
+        <p>Para activar tu cuenta, haz clic aquí:</p>
+        <a href="http://localhost:3000/api/verify-email?token=${verifyToken}" target="_blank" style="color:#4f46e5;">
+          Verificar cuenta
+        </a>
+        <p style="font-size:12px;color:gray;">Este enlace es válido hasta que verifiques tu cuenta. Si no fuiste tú, ignora este mensaje.</p>
+      `,
+    });
+
     return NextResponse.json(
-      { message: "Usuario creado correctamente." },
+      {
+        message:
+          "Usuario creado correctamente. Revisa tu correo para verificar tu cuenta.",
+      },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error en /api/auth/register:", error);
     return NextResponse.json(
       { message: "Error interno del servidor." },

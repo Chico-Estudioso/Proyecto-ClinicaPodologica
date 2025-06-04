@@ -1,7 +1,6 @@
-// src/app/dashboard/page.tsx
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/db";
 import DashboardClient from "./dashboard-client";
 
@@ -16,16 +15,17 @@ export default async function DashboardPage() {
     orderBy: { date: "asc" },
   });
 
-  const transformedAppointments = appointments.map((a) => ({
-    id: a.id,
-    date: a.date.toISOString(),
+  const mapped = appointments.map((appt) => ({
+    id: appt.id,
+    date: appt.date.toISOString(),
   }));
 
   return (
     <DashboardClient
-      appointments={transformedAppointments}
+      appointments={mapped}
       isAdmin={isAdmin}
       username={session.user.username}
+      emailVerified={session.user.emailVerified ?? null}
     />
   );
 }
