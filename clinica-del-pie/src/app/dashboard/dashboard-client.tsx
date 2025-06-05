@@ -7,13 +7,15 @@ import { toast } from "sonner";
 type Appointment = {
   id: string;
   date: string;
+  attended: boolean | null;
 };
 
 type Props = {
   appointments: Appointment[];
   isAdmin: boolean;
   username: string;
-  emailVerified: string | null | undefined; // ✅ actualizado
+  emailVerified: string | null | undefined;
+  banned: boolean;
 };
 
 export default function DashboardClient({
@@ -21,6 +23,7 @@ export default function DashboardClient({
   isAdmin,
   username,
   emailVerified,
+  banned,
 }: Props) {
   const [appointments, setAppointments] = useState(initialAppointments);
   const [isPending, startTransition] = useTransition();
@@ -71,13 +74,14 @@ export default function DashboardClient({
     <div className="container mx-auto py-12">
       <h1 className="text-3xl font-bold mb-6">PÁGINA USUARIOS</h1>
       <p className="mb-2">Hola, {username}.</p>
+
       {isAdmin ? (
         <p className="text-green-700 font-medium mb-4">Eres Administrador.</p>
       ) : (
         <p className="text-gray-700 mb-4">Eres un usuario registrado.</p>
       )}
 
-      {emailVerified === null && (
+      {!isAdmin && emailVerified === null && (
         <div className="bg-yellow-100 text-yellow-800 p-4 rounded mb-6">
           ⚠️ Tu cuenta aún no está verificada.
           <br />
@@ -91,6 +95,15 @@ export default function DashboardClient({
           >
             Reenviar email de verificación
           </Button>
+        </div>
+      )}
+
+      {!isAdmin && banned && (
+        <div className="bg-red-100 text-red-800 p-4 rounded mb-6">
+          🚫 Tu cuenta ha sido vetada por no asistir a citas.
+          <br />
+          No podrás reservar nuevas citas hasta que un administrador levante el
+          veto.
         </div>
       )}
 
@@ -165,6 +178,14 @@ export default function DashboardClient({
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
+                </p>
+                <p className="text-sm mt-1">
+                  Estado:{" "}
+                  {appt.attended === true
+                    ? "✅ Asististe"
+                    : appt.attended === false
+                      ? "❌ No asististe"
+                      : "⏳ Pendiente de revisión"}
                 </p>
               </li>
             ))}

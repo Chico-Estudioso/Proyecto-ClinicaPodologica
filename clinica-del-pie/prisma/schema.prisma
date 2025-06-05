@@ -16,10 +16,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   emailVerified      DateTime?
-  emailVerifyToken   String?  // 👈 Añadido
+  emailVerifyToken   String?
+  banned           Boolean  @default(false)  
   sessions     Session[]
   accounts     Account[]
-  appointments Appointment[] // NUEVA relación
+  appointments Appointment[]  
 }
 
 model Account {

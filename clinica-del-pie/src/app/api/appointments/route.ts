@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { date } = body;
+  const { date, userId } = body;
 
   if (!date) {
     return NextResponse.json({ message: "Fecha requerida" }, { status: 400 });
@@ -26,9 +26,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Hora ya reservada" }, { status: 400 });
   }
 
+  // Si es ADMIN puede usar el userId que venga, si no, forzamos el suyo
+  const finalUserId =
+    session.user.role === "ADMIN" && userId ? userId : session.user.id;
+
+  const user = await prisma.user.findUnique({
+    where: { id: finalUserId },
+  });
+
+  if (!user) {
+    return NextResponse.json(
+      { message: "Usuario no encontrado" },
+      { status: 404 }
+    );
+  }
+
+  if (user.banned) {
+    return NextResponse.json(
+      {
+        message: "El usuario está vetado. Contacta con un administrador.",
+      },
+      { status: 403 }
+    );
+  }
+
   const newAppointment = await prisma.appointment.create({
     data: {
-      userId: session.user.id,
+      userId: finalUserId,
       date: appointmentDate,
     },
   });

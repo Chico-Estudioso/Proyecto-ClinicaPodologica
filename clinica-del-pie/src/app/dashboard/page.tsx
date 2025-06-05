@@ -10,14 +10,28 @@ export default async function DashboardPage() {
 
   const isAdmin = session.user.role === "ADMIN";
 
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      emailVerified: true,
+      banned: true,
+    },
+  });
+
   const appointments = await db.appointment.findMany({
     where: { userId: session.user.id },
     orderBy: { date: "asc" },
+    select: {
+      id: true,
+      date: true,
+      attended: true,
+    },
   });
 
   const mapped = appointments.map((appt) => ({
     id: appt.id,
     date: appt.date.toISOString(),
+    attended: appt.attended,
   }));
 
   return (
@@ -26,6 +40,7 @@ export default async function DashboardPage() {
       isAdmin={isAdmin}
       username={session.user.username}
       emailVerified={session.user.emailVerified ?? null}
+      banned={user?.banned ?? false}
     />
   );
 }
